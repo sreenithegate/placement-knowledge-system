@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 const Login = () => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,13 +31,11 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(user));
       }
 
-      // Force a small delay to ensure storage writes, then redirect to dashboard
-      navigate('/dashboard');
-      window.location.reload(); // Ensures navbar/auth state refreshes instantly
+      // Force a hard redirect to the dashboard to instantly load state and UI
+      window.location.href = '/dashboard';
     } catch (err) {
       console.error('Login error:', err);
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
-    } finally {
       setLoading(false);
     }
   };
