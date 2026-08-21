@@ -9,33 +9,44 @@ const Dashboard = () => {
   const [stats, setStats] = useState({ total: 0, totalViews: 0 });
   const [loading, setLoading] = useState(true);
   
-  const user = JSON.parse(localStorage.getItem('user'));
+  // Safe helper to read user without crashing
+  const getUser = () => {
+    try {
+      const item = localStorage.getItem('user');
+      if (!item || item === 'undefined' || item === 'null') return null;
+      return JSON.parse(item);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const user = getUser();
 
   useEffect(() => {
-    // Protected Route: If no user is found, redirect to login
-    if (!user) {
+    // Protected Route: If no user or token is found, redirect to login
+    const token = localStorage.getItem('token');
+    if (!token || !user) {
       navigate('/login');
       return;
     }
     fetchDashboardData();
-  }, [navigate, user]);
+  }, [navigate]);
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch both newest and popular articles concurrently
       const [recentRes, popularRes] = await Promise.all([
-        api.get('/knowledge?sort=newest&limit=5'),
-        api.get('/knowledge?sort=popular&limit=5')
+        api.get('/knowledge?sort=newest&limit=5').catch(() => ({ data: {} })),
+        api.get('/knowledge?sort=popular&limit=5').catch(() => ({ data: {} }))
       ]);
 
-      setRecentArticles(recentRes.data.articles);
-      setPopularArticles(popularRes.data.articles);
+      const recentList = recentRes.data?.articles || recentRes.data || [];
+      const popularList = popularRes.data?.articles || popularRes.data || [];
+      const totalArticles = recentRes.data?.pagination?.totalArticles || recentList.length;
+      const totalViews = popularList.reduce((sum, item) => sum + (item.views || 0), 0);
 
-      // Calculate simple stats based on the platform data
-      setStats({
-        total: recentRes.data.pagination.totalArticles,
-        totalViews: popularRes.data.articles.reduce((sum, item) => sum + item.views, 0)
-      });
+      setRecentArticles(recentList);
+      setPopularArticles(popularList);
+      setStats({ total: totalArticles, totalViews });
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -60,7 +71,7 @@ const Dashboard = () => {
         </div>
         <div className="stat-card">
           <h3>Your Role</h3>
-          <p style={{ fontSize: '1.5rem', marginTop: '10px', textTransform: 'capitalize' }}>{user.role}</p>
+          <p style={{ fontSize: '1.5rem', marginTop: '10px', textTransform: 'capitalize' }}>{user?.role || 'Student'}</p>
         </div>
       </div>
 
