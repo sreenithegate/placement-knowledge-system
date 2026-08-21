@@ -57,7 +57,7 @@ const EditKnowledge = () => {
         if (article.file) {
           setCurrentFile(article.file);
         }
-      } catch (err) {
+      } catch { 
         setError('Failed to load article details.');
       } finally {
         setLoading(false);

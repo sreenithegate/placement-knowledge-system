@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 
@@ -9,30 +9,19 @@ const Dashboard = () => {
   const [stats, setStats] = useState({ total: 0, totalViews: 0 });
   const [loading, setLoading] = useState(true);
   
-  // Safe helper to read user without crashing
   const getUser = () => {
     try {
       const item = localStorage.getItem('user');
       if (!item || item === 'undefined' || item === 'null') return null;
       return JSON.parse(item);
-    } catch (e) {
+    } catch {
       return null;
     }
   };
 
   const user = getUser();
 
-  useEffect(() => {
-    // Protected Route: If no user or token is found, redirect to login
-    const token = localStorage.getItem('token');
-    if (!token || !user) {
-      navigate('/login');
-      return;
-    }
-    fetchDashboardData();
-  }, [navigate]);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const [recentRes, popularRes] = await Promise.all([
         api.get('/knowledge?sort=newest&limit=5').catch(() => ({ data: {} })),
@@ -52,7 +41,17 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token || !user) {
+      navigate('/login');
+      return;
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchDashboardData();
+  }, [navigate, user, fetchDashboardData]);
 
   if (loading) return <div style={{ textAlign: 'center', marginTop: '50px' }}>Loading Dashboard...</div>;
 

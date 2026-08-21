@@ -17,7 +17,7 @@ const KnowledgeDetails = () => {
     try {
       const item = localStorage.getItem('user');
       return item && item !== 'undefined' ? JSON.parse(item) : null;
-    } catch (error) {
+    } catch  {
       return null;
     }
   };
