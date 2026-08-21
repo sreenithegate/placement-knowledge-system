@@ -155,7 +155,7 @@ const KnowledgeDetails = () => {
           </div>
         </div>
 
-        {article.tags && article.tags.length > 0 && (
+        {article.tags && article.tags?.length > 0 && (
           <div className="card-tags" style={{ marginTop: '1rem', marginBottom: '0' }}>
             {article.tags.map((tag, index) => (
               <span key={index} className="badge tag-badge">#{tag}</span>
