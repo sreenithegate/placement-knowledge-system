@@ -20,9 +20,15 @@ const KnowledgeList = () => {
     setLoading(true);
     try {
       const response = await api.get(`/knowledge${query}`);
-      setArticles(response.data.articles);
+      // Safely handle different response structures to prevent undefined errors
+      const data = response.data;
+      const list = Array.isArray(data) 
+        ? data 
+        : (data.articles || data.knowledge || []);
+      setArticles(list);
     } catch (error) {
       console.error('Error fetching knowledge:', error);
+      setArticles([]);
     } finally {
       setLoading(false);
     }
@@ -79,14 +85,14 @@ const KnowledgeList = () => {
         <div style={{ textAlign: 'center', marginTop: '50px' }}>Loading Knowledge...</div>
       ) : (
         <>
-          {articles.length === 0 ? (
+          {(articles?.length || 0) === 0 ? (
             <div className="empty-state">
               <h3>No articles found</h3>
               <p>Try adjusting your search or filters.</p>
             </div>
           ) : (
             <div className="knowledge-grid">
-              {articles.map(article => (
+              {articles?.map(article => (
                 <KnowledgeCard key={article._id} article={article} />
               ))}
             </div>
