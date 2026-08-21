@@ -18,18 +18,26 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Send data to backend POST /api/auth/login
       const response = await api.post('/auth/login', formData);
-      
-      // Save token and user info to Local Storage
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      // Redirect to dashboard
+      const resData = response.data;
+
+      // Safely grab token and user across different possible backend property names
+      const token = resData.token || resData.accessToken || resData.jwt;
+      const user = resData.user || resData.data || resData.userInfo;
+
+      if (token) {
+        localStorage.setItem('token', token);
+      }
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+
+      // Force a small delay to ensure storage writes, then redirect to dashboard
       navigate('/dashboard');
+      window.location.reload(); // Ensures navbar/auth state refreshes instantly
     } catch (err) {
-      // Extract error message from backend or show default
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
