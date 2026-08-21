@@ -1,15 +1,14 @@
-import { Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Home from './pages/KnowledgeList';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import KnowledgeList from './pages/KnowledgeList';
 import AddKnowledge from './pages/AddKnowledge';
 import KnowledgeDetails from './pages/KnowledgeDetails';
 import EditKnowledge from './pages/EditKnowledge';
-import AdminDashboard from './pages/AdminDashboard'; // New Import
-
-const NotFound = () => <div style={{ padding: '2rem' }}><h2>404 - Page Not Found</h2></div>;
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
