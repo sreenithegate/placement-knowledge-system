@@ -13,22 +13,23 @@ const NotFound = () => <div style={{ padding: '2rem' }}><h2>404 - Page Not Found
 
 function App() {
   return (
-    <div>
-      <Navbar />
-      <div>
-        <Routes>
-          <Route path="/" element={<KnowledgeList />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/add-knowledge" element={<AddKnowledge />} />
-          <Route path="/knowledge/:id" element={<KnowledgeDetails />} />
-          <Route path="/edit-knowledge/:id" element={<EditKnowledge />} />
-          <Route path="/admin" element={<AdminDashboard />} /> {/* New Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+    <Router>
+      <div className="app">
+        <Navbar />
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/add-knowledge" element={<AddKnowledge />} />
+            <Route path="/knowledge/:id" element={<KnowledgeDetails />} />
+            <Route path="/edit-knowledge/:id" element={<EditKnowledge />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }
 
