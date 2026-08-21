@@ -12,7 +12,17 @@ const KnowledgeDetails = () => {
   const [deleting, setDeleting] = useState(false);
   const [downloading, setDownloading] = useState(false);
   
-  const user = JSON.parse(localStorage.getItem('user'));
+  // Safe helper to read the user from localStorage without crashing
+  const getUser = () => {
+    try {
+      const item = localStorage.getItem('user');
+      return item && item !== 'undefined' ? JSON.parse(item) : null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  const user = getUser();
 
   useEffect(() => {
     const fetchArticleDetails = async () => {
@@ -60,17 +70,13 @@ const KnowledgeDetails = () => {
     return fileUrl;
   };
 
-  // The Ultimate React Download Fix with PDF Exception Handling
   const handleDownload = async (fileUrl, originalName) => {
-    // 1. PDF Exception: Browsers block cross-origin background downloads for PDFs. 
-    // We safely fallback to opening it in a new tab so the user can use the native save button.
     const isPDF = originalName.toLowerCase().endsWith('.pdf') || fileUrl.toLowerCase().endsWith('.pdf');
     if (isPDF) {
       window.open(fileUrl, '_blank', 'noopener,noreferrer');
       return; 
     }
 
-    // 2. Standard Blob Download for Images and Office Docs
     try {
       setDownloading(true);
       
@@ -92,7 +98,6 @@ const KnowledgeDetails = () => {
       window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
       console.error("Download failed", err);
-      // Fallback for any other strict browser security blocks
       window.open(fileUrl, '_blank', 'noopener,noreferrer');
     } finally {
       setDownloading(false);
